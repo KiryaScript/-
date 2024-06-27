@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Предупреждение</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            background-color: #000;
+        }
+        #warning {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            color: #ff0000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+        }
+        #warning h1 {
+            font-size: 48px;
+            text-shadow: 0 0 10px #ff0000;
+            animation: pulse 2s infinite;
+        }
+        #warning p {
+            font-size: 24px;
+            max-width: 80%;
+            text-align: center;
+            margin: 20px 0;
+        }
+        #accept {
+            font-size: 24px;
+            padding: 15px 30px;
+            background-color: #ff0000;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        #accept:hover {
+            background-color: #cc0000;
+            transform: scale(1.1);
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        #content {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        #background-gif {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(80%);
+        }
+        .text-overlay {
+            position: fixed;
+            font-size: 76px;
+            color: #ff0000;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            font-family: 'Creepster', cursive;
+            animation: shake 0.2s infinite;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="warning">
+        <h1>ПРЕДУПРЕЖДЕНИЕ</h1>
+        <p>Этот сайт содержит шокирующий контент, включая мигающие изображения и громкие звуки. Просмотр может вызвать эпилептические приступы и другие негативные эффекты. Автор сайта не хотел никому навредить. Продолжайте на свой страх и риск.</p>
+        <button id="accept">Я понимаю риски и хочу продолжить</button>
+    </div>
+    <div class="scary-eye"></div>
+
+    <div id="content">
+        <img id="background-gif" src="main.gif" alt="Background">
+        <div id="text-overlay1" class="text-overlay"></div>
+        <div id="text-overlay2" class="text-overlay"></div>
+    </div>
+
+    <audio id="background-audio" loop>
+        <source src="audio.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const warningEl = document.getElementById('warning');
+        const contentEl = document.getElementById('content');
+        const acceptBtn = document.getElementById('accept');
+        const audio = document.getElementById('background-audio');
+
+        let words = [];
+
+        acceptBtn.addEventListener('click', () => {
+            warningEl.style.display = 'none';
+            contentEl.style.display = 'block';
+            startContent();
+            audio.play().catch(e => console.error('Ошибка воспроизведения аудио:', e));
+        });
+
+        function startContent() {
+            fetch('words.txt')
+                .then(response => response.text())
+                .then(text => {
+                    words = text.split('\n').filter(word => word.trim() !== '');
+                    console.log('Загруженные слова:', words);
+                    if (words.length === 0) {
+                        console.error('Файл words.txt пуст или не загрузился');
+                    }
+                    setInterval(showRandomMessages, 2000);
+                    audio.addEventListener('ended', increaseVolume);
+                })
+                .catch(error => console.error('Ошибка загрузки слов:', error));
+        }
+
+        function showRandomMessages() {
+            const textOverlay1 = document.getElementById('text-overlay1');
+            const textOverlay2 = document.getElementById('text-overlay2');
+
+            const message1 = words[Math.floor(Math.random() * words.length)];
+            const message2 = words[Math.floor(Math.random() * words.length)];
+
+textOverlay1.textContent = message1;
+textOverlay2.textContent = message2;
+
+randomizeTextPosition(textOverlay1);
+randomizeTextPosition(textOverlay2);
+}
+
+function randomizeTextPosition(element) {
+const x = Math.random() * (window.innerWidth - element.offsetWidth);
+const y = Math.random() * (window.innerHeight - element.offsetHeight);
+element.style.left = `${x}px`;
+element.style.top = `${y}px`;
+}
+
+function flickerText() {
+document.getElementById('text-overlay1').style.opacity = Math.random();
+document.getElementById('text-overlay2').style.opacity = Math.random();
+}
+
+setInterval(flickerText, 100);
+
+function increaseVolume() {
+audio.volume = Math.min(1, audio.volume * 1.15);
+audio.play();
+}
+
+function createNoise() {
+const noise = document.createElement('div');
+noise.style.position = 'fixed';
+noise.style.width = '2px';
+noise.style.height = '2px';
+noise.style.background = 'white';
+noise.style.opacity = Math.random();
+noise.style.left = Math.random() * window.innerWidth + 'px';
+noise.style.top = Math.random() * window.innerHeight + 'px';
+contentEl.appendChild(noise);
+
+setTimeout(() => {
+    noise.remove();
+}, 100);
+}
+
+setInterval(createNoise, 50);
+
+function createDistortion() {
+contentEl.style.filter = `hue-rotate(${Math.random() * 360}deg) blur(${Math.random() * 5}px)`;
+setTimeout(() => {
+    contentEl.style.filter = 'none';
+}, 100);
+}
+
+setInterval(createDistortion, 2000);
+
+function updateWords() {
+fetch('words.txt')
+    .then(response => response.text())
+    .then(text => {
+        words = text.split('\n').filter(word => word.trim() !== '');
+    })
+    .catch(error => console.error('Ошибка обновления слов:', error));
+}
+
+setInterval(updateWords, 300000);
+
+window.addEventListener('resize', () => {
+randomizeTextPosition(document.getElementById('text-overlay1'));
+randomizeTextPosition(document.getElementById('text-overlay2'));
+});
+
+// Добавляем несколько "глаз" для более пугающего эффекта
+for (let i = 0; i < 5; i++) {
+const eye = document.createElement('div');
+eye.className = 'scary-eye';
+eye.style.animationDelay = `${i * 0.5}s`;
+document.body.appendChild(eye);
+}
+
+audio.addEventListener('canplaythrough', () => {
+console.log('Аудио загружено и готово к воспроизведению');
+});
+
+audio.addEventListener('error', (e) => {
+console.error('Ошибка загрузки аудио:', e);
+});
+</script>
+</body>
+</html>
