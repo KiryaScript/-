@@ -85,6 +85,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
 </head>
 <body>
+        <div id="timer" style="position: fixed; top: 10px; left: 50%; transform: translateX(-50%); font-size: 24px; color: #ff0000; z-index: 2000;">
+            ????: <span id="countdown"></span>
+        </div>
     <div id="warning">
         <h1>ПРЕДУПРЕЖДЕНИЕ</h1>
         <p>Этот сайт содержит шокирующий контент, включая мигающие изображения и громкие звуки. Просмотр может вызвать эпилептические приступы и другие негативные эффекты. Автор сайта не хотел никому навредить. Продолжайте на свой страх и риск.</p>
@@ -223,6 +226,31 @@ console.log('Аудио загружено и готово к воспроизв
 audio.addEventListener('error', (e) => {
 console.error('Ошибка загрузки аудио:', e);
 });
+
 </script>
+    <script>
+    function updateCountdown() {
+        const targetDate = new Date("2024-08-31T23:59:59").getTime(); // Замените на нужную вам дату
+        const now = new Date().getTime();
+        const difference = targetDate - now;
+
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+        document.getElementById("countdown").innerHTML = days + "д " + hours + "ч "
+        + minutes + "м " + seconds + "с ";
+
+        if (difference < 0) {
+            clearInterval(countdownTimer);
+            document.getElementById("countdown").innerHTML = "ВРЕМЯ ИСТЕКЛО";
+        }
+    }
+
+    const countdownTimer = setInterval(updateCountdown, 1000);
+    updateCountdown(); // Вызовите функцию сразу, чтобы избежать задержки в отображении
+</script>
+</body>
 </body>
 </html>
